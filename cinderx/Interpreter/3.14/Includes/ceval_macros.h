@@ -81,6 +81,11 @@
 #endif
 
 #if Py_TAIL_CALL_INTERP
+#if !defined(__clang__) && (!defined(__GNUC__) || __GNUC__ < 15)
+    // Compilers that ignore [[clang::musttail]] turn dispatch into plain
+    // calls, which pin C stack frames until the eval loop exits.
+#error "The tail-call interpreter requires [[clang::musttail]]: build with Clang or GCC 15+."
+#endif
     // Note: [[clang::musttail]] works for GCC 15, but not __attribute__((musttail)) at the moment.
 #   define Py_MUSTTAIL [[clang::musttail]]
 #   define Py_PRESERVE_NONE_CC __attribute__((preserve_none))
